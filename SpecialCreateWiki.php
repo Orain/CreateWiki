@@ -110,6 +110,7 @@ class SpecialCreateWiki extends SpecialPage {
 		}
 
 		$dbw->insert( 'site_stats', array( 'ss_row_id' => 1 ) );
+		$dbw->close();
 
 		$form->getOutput()->addWikiMsg( 'createwiki-success', $DBname );
 		return true;
