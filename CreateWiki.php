@@ -18,9 +18,10 @@ $wgSpecialPages['CreateWiki'] = 'SpecialCreateWiki';
 
 $wgAvailableRights[] = 'createwiki';
 $wgLogTypes[] = 'farmer';
-$wgLogActionsHandlers['farmer/create'] = 'LogFormatter';
+$wgLogActionsHandlers['farmer/*'] = 'LogFormatter';
 
 /**
  * SQL files to be sourced into the created databases.
  */
 $wgCreateWikiSQLfiles = array( "$IP/maintenance/tables.sql" );
+
