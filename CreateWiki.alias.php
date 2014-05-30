@@ -14,3 +14,10 @@ $specialPageAliases = array();
 $specialPageAliases['en'] = array(
 	'CreateWiki' => array( 'CreateWiki' ),
 );
+
+/** Dutch
+ * @author Southparkfan
+ */
+$specialPageAliases['nl'] = array(
+	'CreateWiki' => array( 'MaakWiki', 'WikiAanmaken' ),
+);
