@@ -12,6 +12,7 @@ $messages = array();
  * @author Kudu
  */
 $messages['en'] = array(
+	'action-createwiki'	       => 'create a wiki', 	
 	'createwiki'                   => 'Create a wiki',
 	'createwiki-desc'              => 'Create a new wiki on a wiki farm',
 	'createwiki-label-comment'     => 'Comment',
@@ -43,10 +44,30 @@ $messages['ko'] = array(
 	'log-name-farmer'              => '위키 팜 기록',
 	'logentry-farmer-create'       => '$1 사용자가 위키 "$4" 를 생성하였습니다.',
 );
+/** Dutch
+ * @author Southparkfan
+ */
+$messages['nl'] = array(
+	'action-createwiki'	       => 'maak een wiki aan',	
+	'createwiki'                   => 'Maak een wiki aan',
+	'createwiki-desc'              => 'Maak een nieuwe wiki aan in een wikigroep',
+	'createwiki-label-comment'     => 'Opmerking',
+	'createwiki-label-create'      => 'Maak wiki aan',
+	'createwiki-label-dbname'      => 'Databasenaam',
+	'createwiki-error-dbexists'    => 'De database bestaat al.',
+	'createwiki-error-notsuffixed' => 'De databasenaam moet eindigen op een aangepaste suffix.',
+	'createwiki-error-notalnum'    => 'De databasenaam moet alfanumeriek zijn.',
+	'createwiki-success'           => '$1 is succesvol aangemaakt.',
+	'log-description-farmer'       => 'Dit is een logboek dat veranderingen gemaakt aan de wikigroep.',
+	'log-name-farmer'              => 'Logboek nieuwe wiki\'s',
+	'logentry-farmer-create'       => '$1 maakte de wiki "$4" aan',
+);
+
 /** Message documentation (Message documentation)
- * @author Kudu
+ * @author Kudu and Southparkfan
  */
 $messages['qqq'] = array(
+	'action-createwiki'            => 'Text will be shown when trying to create a wiki without having the needed rights. Will be shown with MediaWiki:permissionserrorstext-withaction.',  
 	'createwiki'                   => 'The title of Special:CreateWiki.',
 	'createwiki-desc'              => 'The description of the extension.',
 	'createwiki-label-comment'     => 'The label for the comment field.',
