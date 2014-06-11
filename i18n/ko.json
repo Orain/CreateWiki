@@ -15,5 +15,5 @@
 	"createwiki-success": "$1 위키를 성공적으로 생성하였습니다.",
 	"log-description-farmer": "위키 팜에 생긴 변화에 대한 기록입니다.",
 	"log-name-farmer": "위키 팜 기록",
-	"logentry-farmer-create": "$1 사용자가 위키 \"$4\" 를 생성하였습니다."
+	"logentry-farmer-create": "$1 사용자가 \"$4\" 위키를 생성하였습니다."
 }
