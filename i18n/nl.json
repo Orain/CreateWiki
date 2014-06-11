@@ -1,0 +1,20 @@
+{
+	"@metadata": {
+		"authors": [
+			"Southparkfan"
+		]
+	},
+	"action-createwiki": "maak een wiki aan",
+	"createwiki": "Maak een wiki aan",
+	"createwiki-desc": "Maak een nieuwe wiki aan in een wikigroep",
+	"createwiki-label-comment": "Opmerking",
+	"createwiki-label-create": "Maak wiki aan",
+	"createwiki-label-dbname": "Databasenaam",
+	"createwiki-error-dbexists": "De database bestaat al.",
+	"createwiki-error-notsuffixed": "De databasenaam moet eindigen op een aangepaste suffix.",
+	"createwiki-error-notalnum": "De databasenaam moet alfanumeriek zijn.",
+	"createwiki-success": "$1 is succesvol aangemaakt.",
+	"log-description-farmer": "Dit is een logboek dat veranderingen gemaakt aan de wikigroep.",
+	"log-name-farmer": "Logboek nieuwe wiki's",
+	"logentry-farmer-create": "$1 maakte de wiki \"$4\" aan"
+}
