@@ -1,0 +1,19 @@
+{
+	"@metadata": {
+		"authors": [
+			"Revi"
+		]
+	},
+	"createwiki": "위키 만들기",
+	"createwiki-desc": "위키 팜에 새로운 위키 만들기",
+	"createwiki-label-comment": "덧글",
+	"createwiki-label-create": "생성",
+	"createwiki-label-dbname": "데이터베이스 이름",
+	"createwiki-error-dbexists": "데이터베이스가 이미 존재합니다.",
+	"createwiki-error-notsuffixed": "데이터베이스 이름은 미리 설정된 접미사로 끝나야 합니다.",
+	"createwiki-error-notalnum": "데이터베이스 이름은 알파벳 혹은 숫자여야 합니다.",
+	"createwiki-success": "$1 위키를 성공적으로 생성하였습니다.",
+	"log-description-farmer": "위키 팜에 생긴 변화에 대한 기록입니다.",
+	"log-name-farmer": "위키 팜 기록",
+	"logentry-farmer-create": "$1 사용자가 \"$4\" 위키를 생성하였습니다."
+}

@@ -13,7 +13,7 @@ $wgExtensionCredits['specialpage'][] = array(
 
 $wgAutoloadClasses['SpecialCreateWiki'] = dirname( __FILE__ ) . '/SpecialCreateWiki.php';
 $wgExtensionMessagesFiles['CreateWiki'] = dirname( __FILE__ ) . '/CreateWiki.i18n.php';
-$wgMessagesDirs['CreateWiki'] = dirname( __FILE__) . '/i18n';
+$wgMessagesDirs['CreateWiki'] = dirname( __FILE__ ) . '/i18n';
 $wgExtensionMessagesFiles['CreateWikiAlias'] = dirname( __FILE__ ) . '/CreateWiki.alias.php';
 $wgSpecialPages['CreateWiki'] = 'SpecialCreateWiki';
 

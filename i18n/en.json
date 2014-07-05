@@ -4,6 +4,7 @@
 			"Kudu"
 		]
 	},
+	"action-createwiki": "create a wiki",
 	"createwiki": "Create a wiki",
 	"createwiki-desc": "Create a new wiki on a wiki farm",
 	"createwiki-label-comment": "Comment",
