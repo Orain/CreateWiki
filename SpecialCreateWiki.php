@@ -30,14 +30,22 @@ class SpecialCreateWiki extends SpecialPage {
 		$form = new HTMLForm( array(
 				'dbname' => array(
 					'default' => $par, // e.g. Special:CreateWiki/enwiki
-					'filter-callback' => array( 'SpecialCreateWiki', 'filterDBname' ),
+					'filter-callback' => array( 'SpecialCreateWiki', 'filter' ),
 					'label-message' => 'createwiki-label-dbname',
 					'maxlength' => 30,
 					'required' => true,
 					'size' => 30,
 					'type' => 'text',
 					'validation-callback' => array( 'SpecialCreateWiki', 'validateDBname' ),
-			 	),
+				),
+				'founder' => array(
+					'filter-callback' => array( 'SpecialCreateWiki', 'filter' ),
+					'label-message' => 'createwiki-label-founder',
+					'required' => true,
+					'size' => 30,
+					'type' => 'text',
+					'validation-callback' => array( 'SpecialCreateWiki', 'validateFounder' ),
+				),
 				'comment' => array(
 					'label-message' => 'createwiki-label-comment',
 					'maxlength' => 79,
@@ -52,8 +60,8 @@ class SpecialCreateWiki extends SpecialPage {
 		$form->show();
 	}
 
-	static function filterDBname( $DBname, $allData ) {
-		return trim( $DBname );
+	static function filter( $string, $allData ) {
+		return trim( $string );
 	}
 
 	static function validateDBname( $DBname, $allData ) {
@@ -78,9 +86,19 @@ class SpecialCreateWiki extends SpecialPage {
 		return true;
 	}
 
+	static function validateFounder( $founderName, $allData ) {
+		$user = User::newFromName( $founderName );
+		if ( !$user->getId() ) {
+			return wfMessage( 'createwiki-error-nonexistentfounder' )->plain();
+		}
+		return true;
+	}
+
 	static function processInput( $formData, $form ) {
-		global $wgCreateWikiSQLfiles;
+		error_reporting( 0 );
+		global $wgCreateWikiSQLfiles, $IP;
 		$DBname = $formData['dbname'];
+		$founderName = $formData['founder'];
 		$dbw = wfGetDB( DB_MASTER );
 
 		$dbTest = $dbw->query( 'SHOW DATABASES LIKE ' . $dbw->addQuotes( $DBname ) . ';' );
@@ -90,16 +108,17 @@ class SpecialCreateWiki extends SpecialPage {
 			return wfMessage( 'createwiki-error-dbexists' )->plain();
 		}
 
-		$logEntry = new ManualLogEntry( 'farmer', 'create' );
-		$logEntry->setPerformer( $form->getUser() );
-		$logEntry->setTarget( $form->getTitle() );
-		$logEntry->setComment( $formData['comment'] );
-		$logEntry->setParameters( array(
+		$farmerLogEntry = new ManualLogEntry( 'farmer', 'createandpromote' );
+		$farmerLogEntry->setPerformer( $form->getUser() );
+		$farmerLogEntry->setTarget( $form->getTitle() );
+		$farmerLogEntry->setComment( $formData['comment'] );
+		$farmerLogEntry->setParameters( array(
 				'4::wiki' => $DBname,
+				'5::founder' => $founderName,
 			)
 		);
-		$logID = $logEntry->insert();
-		$logEntry->publish( $logID );
+		$farmerLogID = $farmerLogEntry->insert();
+		$farmerLogEntry->publish( $farmerLogID );
 
 		$dbw->query( 'SET storage_engine=InnoDB;' );
 		$dbw->query( 'CREATE DATABASE ' . $dbw->addIdentifierQuotes( $DBname ) . ';' );
@@ -112,7 +131,21 @@ class SpecialCreateWiki extends SpecialPage {
 		$dbw->insert( 'site_stats', array( 'ss_row_id' => 1 ) );
 		$dbw->close();
 
+		// Create local account for founder (hack)
+		$out = exec( "php $IP/extensions/CentralAuth/maintenance/createLocalAccount.php " . escapeshellarg( $founderName ) . ' --wiki ' . escapeshellarg( $DBname ) );
+		if ( !strpos( $out, 'created' ) ) {
+			return wfMessage( 'createwiki-error-usernotcreated' )->plain();
+		}
+
+		require_once( "$IP/includes/UserRightsProxy.php" );
+		// Grant founder sysop and bureaucrat rights
+		$founderUser = UserRightsProxy::newFromName( $DBname, $founderName );
+		$newGroups = array( 'sysop', 'bureaucrat' );
+		array_map( array( $founderUser, 'addGroup' ), $newGroups );
+		$founderUser->invalidateCache();
+
 		$form->getOutput()->addWikiMsg( 'createwiki-success', $DBname );
 		return true;
 	}
 }
+

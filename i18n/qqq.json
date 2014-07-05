@@ -10,11 +10,16 @@
 	"createwiki-label-comment": "The label for the comment field.",
 	"createwiki-label-create": "The label for the Create button.",
 	"createwiki-label-dbname": "The label for the database name field.",
+	"createwiki-label-founder": "The label for the Founder field.",
 	"createwiki-error-dbexists": "The error message displayed when the database already exists.",
+	"createwiki-error-nonexistentfounder": "The error message displayed when the founder does not exist on Orain Meta.",
 	"createwiki-error-notsuffixed": "The error message displayed when the database name doesn't end in one of the configured suffixes.",
 	"createwiki-error-notalnum": "The error message displayed when the database name isn't alphanumeric.",
+	"createwiki-error-usernotcreated": "The error message displayed when there was an error while creating the founder's user.",
 	"createwiki-success": "The message displayed when the database was successfully created. Parameters:\n* $1 = database name",
 	"log-description-farmer": "The description of the wiki farm log.",
 	"log-name-farmer": "The name of the wiki farm log.",
-	"logentry-farmer-create": "The format of the log entry for wiki creation. Parameters:\n* $1 = user who created the wiki\n* $4 = database name"
+	"logentry-farmer-create": "The format of the log entry for wiki creation. Parameters:\n* $1 = user who created the wiki\n* $4 = database name",
+	"logentry-farmer-createandpromote": "The format of the log entry for wiki creation and founder promotion. Parameters:\n* $1 = user who created the wiki\n* $4 = database name\n* $5 = founder"
+	"createwiki-error-dbexists": "The error message displayed when the database already exists.",
 }

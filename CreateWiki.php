@@ -19,9 +19,19 @@ $wgSpecialPages['CreateWiki'] = 'SpecialCreateWiki';
 
 $wgAvailableRights[] = 'createwiki';
 $wgLogTypes[] = 'farmer';
-$wgLogActionsHandlers['farmer/create'] = 'LogFormatter';
+$wgLogActionsHandlers['farmer/*'] = 'LogFormatter';
 
 /**
  * SQL files to be sourced into the created databases.
  */
-$wgCreateWikiSQLfiles = array( "$IP/maintenance/tables.sql" );
+
+$wgCreateWikiSQLfiles = array(
+	"$IP/maintenance/tables.sql",
+	"$IP/extensions/AbuseFilter/abusefilter.tables.sql",
+	"$IP/extensions/AntiSpoof/sql/patch-antispoof.mysql.sql",
+	"$IP/extensions/CentralNotice/CentralNotice.sql",
+	"$IP/extensions/CheckUser/cu_changes.sql",
+	"$IP/extensions/CheckUser/cu_log.sql",
+	"$IP/extensions/CreateWiki/global_block_whitelist.sql",
+	"$IP/extensions/TitleKey/titlekey.sql"
+);
