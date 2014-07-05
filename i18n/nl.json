@@ -10,11 +10,15 @@
 	"createwiki-label-comment": "Opmerking",
 	"createwiki-label-create": "Maak wiki aan",
 	"createwiki-label-dbname": "Databasenaam",
+	"createwiki-label-founder": "Oprichter",
 	"createwiki-error-dbexists": "De database bestaat al.",
+	"createwiki-error-nonexistentfounder": "De oprichter bestaat niet op Orain Meta.",
 	"createwiki-error-notsuffixed": "De databasenaam moet eindigen op een aangepaste suffix.",
 	"createwiki-error-notalnum": "De databasenaam moet alfanumeriek zijn.",
+	"createwiki-error-usernotcreated": "Er is een foutmelding opgetreden bij het aanmaken van het account van de oprichter.",
 	"createwiki-success": "$1 is succesvol aangemaakt.",
 	"log-description-farmer": "Dit is een logboek dat veranderingen gemaakt aan de wikigroep.",
 	"log-name-farmer": "Logboek nieuwe wiki's",
-	"logentry-farmer-create": "$1 maakte de wiki \"$4\" aan"
+	"logentry-farmer-create": "$1 maakte de wiki \"$4\" aan",
+	"logentry-farmer-createandpromote": "$1 maakte de wiki \"$4\" aan met  \"$5\" als oprichter"
 }
