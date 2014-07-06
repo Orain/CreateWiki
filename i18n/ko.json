@@ -4,6 +4,7 @@
 			"Revi"
 		]
 	},
+    "action-createwiki": "위키 만들기",
 	"createwiki": "위키 만들기",
 	"createwiki-desc": "위키 팜에 새로운 위키 만들기",
 	"createwiki-label-comment": "덧글",
