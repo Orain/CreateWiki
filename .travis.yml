@@ -1,0 +1,7 @@
+language: php
+
+php:
+  - 5.4
+
+script:
+  - bash .travis.phplint.sh
