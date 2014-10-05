@@ -132,7 +132,7 @@ class SpecialCreateWiki extends SpecialPage {
 		$dbw->close();
 
 		// Create local account for founder (hack)
-		$out = exec( "php $IP/extensions/CentralAuth/maintenance/createLocalAccount.php " . escapeshellarg( $founderName ) . ' --wiki ' . escapeshellarg( $DBname ) );
+		$out = exec( "php5 $IP/extensions/CentralAuth/maintenance/createLocalAccount.php " . escapeshellarg( $founderName ) . ' --wiki ' . escapeshellarg( $DBname ) );
 		if ( !strpos( $out, 'created' ) ) {
 			return wfMessage( 'createwiki-error-usernotcreated' )->plain();
 		}
