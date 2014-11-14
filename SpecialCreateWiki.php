@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2013 Orain, Kudu and contributors
+ * Copyright (C) 2013 Orain, Kudu, Southparkfan and contributors
  *
  * This file is part of CreateWiki.
  *
@@ -15,7 +15,7 @@
  * for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with CreateWiki.  If not, see <http://www.gnu.org/licenses/>.
+ * along with CreateWiki. If not, see <http://www.gnu.org/licenses/>.
  */
 
 class SpecialCreateWiki extends SpecialPage {
@@ -81,6 +81,10 @@ class SpecialCreateWiki extends SpecialPage {
 
 		if ( !ctype_alnum( $DBname ) ) {
 			return wfMessage( 'createwiki-error-notalnum' )->plain();
+		}
+
+		if ( strtolower( $DBname ) != $DBname ) {
+			return wfMessage( 'createwiki-label-dbnamecontainsuppercase' )->plain();
 		}
 
 		return true;

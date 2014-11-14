@@ -11,6 +11,7 @@
 	"createwiki-label-create": "Maak wiki aan",
 	"createwiki-label-dbname": "Databasenaam",
 	"createwiki-label-founder": "Oprichter",
+	"createwiki-label-dbnamecontainsuppercase": "De databasenaam mag niet één of meerdere hoofdletters bevatten.",
 	"createwiki-error-dbexists": "De database bestaat al.",
 	"createwiki-error-nonexistentfounder": "De oprichter bestaat niet op Orain Meta.",
 	"createwiki-error-notsuffixed": "De databasenaam moet eindigen op een aangepaste suffix.",

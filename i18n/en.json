@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Kudu"
+			"Kudu",
+			"Southparkfan"
 		]
 	},
 	"action-createwiki": "create a wiki",
@@ -11,6 +12,7 @@
 	"createwiki-label-create": "Create",
 	"createwiki-label-dbname": "Database name",
 	"createwiki-label-founder": "Founder",
+	"createwiki-label-dbnamecontainsuppercase": "The database name may not contain one or more uppercase letters.",
 	"createwiki-error-dbexists": "The database already exists.",
 	"createwiki-error-nonexistentfounder": "The founder does not exist on Orain Meta.",
 	"createwiki-error-notsuffixed": "The database name must end in a configured suffix.",
