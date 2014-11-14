@@ -12,6 +12,7 @@
 	"createwiki-label-create": "The label for the Create button.",
 	"createwiki-label-dbname": "The label for the database name field.",
 	"createwiki-label-founder": "The label for the Founder field.",
+	"createwiki-label-dbnamecontainsuppercase": "The error message displayed when the database name contains one or more uppercase letters.",
 	"createwiki-error-dbexists": "The error message displayed when the database already exists.",
 	"createwiki-error-nonexistentfounder": "The error message displayed when the founder does not exist on Orain Meta.",
 	"createwiki-error-notsuffixed": "The error message displayed when the database name doesn't end in one of the configured suffixes.",
