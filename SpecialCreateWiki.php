@@ -146,8 +146,8 @@ class SpecialCreateWiki extends SpecialPage {
 		$dbw->close();
 
 		// Add DNS record to cloudflare
-		global $wgCreateWikiUseCloudFlare, $wgCloudFlareUser,$wgCloudFlareKey;
-		if( $wgCreateWikiUseCloudFlare ) {
+		global $wgCreateWikiUseCloudFlare, $wgCloudFlareUser, $wgCloudFlareKey;
+		if ( $wgCreateWikiUseCloudFlare ) {
 			$cloudFlare = new cloudflare_api( $wgCloudFlareUser, $wgCloudFlareKey );
 			$cloudFlare->rec_new(
 				'orain.org',
