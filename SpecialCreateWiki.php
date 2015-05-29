@@ -56,7 +56,7 @@ class SpecialCreateWiki extends SpecialPage {
 			)
 		);
 		$form->setSubmitTextMsg( 'createwiki-label-create' );
-		$form->setTitle( $this->getTitle() );
+		$form->setTitle( $this->getPageTitle() );
 		$form->setSubmitCallback( array( 'SpecialCreateWiki', 'processInput' ) );
 		$form->show();
 	}
