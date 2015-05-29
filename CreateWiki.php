@@ -11,6 +11,7 @@ $wgExtensionCredits['specialpage'][] = array(
 	'url' => '//github.com/Orain/CreateWiki'
 );
 
+$wgAutoloadClasses['SpecialCreateWiki'] = dirname( __FILE__ ) . '/lib/class_cloudflare.php';
 $wgAutoloadClasses['SpecialCreateWiki'] = dirname( __FILE__ ) . '/SpecialCreateWiki.php';
 $wgExtensionMessagesFiles['CreateWiki'] = dirname( __FILE__ ) . '/CreateWiki.i18n.php';
 $wgMessagesDirs['CreateWiki'] = dirname( __FILE__ ) . '/i18n';
