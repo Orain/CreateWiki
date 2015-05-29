@@ -99,7 +99,16 @@ class SpecialCreateWiki extends SpecialPage {
 		return true;
 	}
 
-	public static function processInput( $formData, $form ) {
+	/**
+	 * @param array $formData
+	 * @param HtmlForm $form
+	 *
+	 * @return bool|string
+	 * @throws DBUnexpectedError
+	 * @throws Exception
+	 * @throws MWException
+	 */
+	public static function processInput( array $formData, HtmlForm $form ) {
 		error_reporting( 0 );
 		global $wgCreateWikiSQLfiles, $IP;
 		$DBname = $formData['dbname'];
