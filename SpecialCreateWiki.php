@@ -145,6 +145,18 @@ class SpecialCreateWiki extends SpecialPage {
 		$dbw->insert( 'site_stats', array( 'ss_row_id' => 1 ) );
 		$dbw->close();
 
+		// Add DNS record to cloudflare
+		global $wgCreateWikiUseCloudFlare, $wgCloudFlareUser,$wgCloudFlareKey;
+		if( $wgCreateWikiUseCloudFlare ) {
+			$cloudFlare = new cloudflare_api( $wgCloudFlareUser, $wgCloudFlareKey );
+			$cloudFlare->rec_new(
+				'orain.org',
+				'CNAME',
+				substr( $DBname, 0, -4 ),
+				'lb.orain.org'
+			);
+		}
+
 		// Create local account for founder (hack)
 		$out = exec( "php5 $IP/extensions/CentralAuth/maintenance/createLocalAccount.php " . escapeshellarg( $founderName ) . ' --wiki ' . escapeshellarg( $DBname ) );
 		if ( !strpos( $out, 'created' ) ) {
