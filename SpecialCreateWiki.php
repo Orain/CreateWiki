@@ -19,11 +19,12 @@
  */
 
 class SpecialCreateWiki extends SpecialPage {
-	function __construct() {
+
+	public function __construct() {
 		parent::__construct( 'CreateWiki', 'createwiki' );
 	}
 
-	function execute( $par ) {
+	public function execute( $par ) {
 		$this->checkPermissions();
 		$this->setHeaders();
 
@@ -60,11 +61,11 @@ class SpecialCreateWiki extends SpecialPage {
 		$form->show();
 	}
 
-	static function filter( $string, $allData ) {
+	public static function filter( $string, $allData ) {
 		return trim( $string );
 	}
 
-	static function validateDBname( $DBname, $allData ) {
+	public static function validateDBname( $DBname, $allData ) {
 		global $wgConf;
 
 		$suffixed = false;
@@ -90,7 +91,7 @@ class SpecialCreateWiki extends SpecialPage {
 		return true;
 	}
 
-	static function validateFounder( $founderName, $allData ) {
+	public static function validateFounder( $founderName, $allData ) {
 		$user = User::newFromName( $founderName );
 		if ( !$user->getId() ) {
 			return wfMessage( 'createwiki-error-nonexistentfounder' )->plain();
@@ -98,7 +99,7 @@ class SpecialCreateWiki extends SpecialPage {
 		return true;
 	}
 
-	static function processInput( $formData, $form ) {
+	public static function processInput( $formData, $form ) {
 		error_reporting( 0 );
 		global $wgCreateWikiSQLfiles, $IP;
 		$DBname = $formData['dbname'];
@@ -151,5 +152,5 @@ class SpecialCreateWiki extends SpecialPage {
 		$form->getOutput()->addWikiMsg( 'createwiki-success', $DBname );
 		return true;
 	}
-}
 
+}
