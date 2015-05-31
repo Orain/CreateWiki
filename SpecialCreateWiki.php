@@ -148,13 +148,19 @@ class SpecialCreateWiki extends SpecialPage {
 		// Add DNS record to cloudflare
 		global $wgCreateWikiUseCloudFlare, $wgCloudFlareUser, $wgCloudFlareKey;
 		if ( $wgCreateWikiUseCloudFlare ) {
+			$domainPrefix = substr( $DBname, 0, -4 );
 			$cloudFlare = new cloudflare_api( $wgCloudFlareUser, $wgCloudFlareKey );
-			$cloudFlare->rec_new(
+			$cloudFlareResult = $cloudFlare->rec_new(
 				'orain.org',
 				'CNAME',
-				substr( $DBname, 0, -4 ),
+				$domainPrefix,
 				'lb.orain.org'
 			);
+			if( !is_object( $cloudFlareResult ) || $cloudFlareResult->result !== 'success' ) {
+				wfDebugLog( 'CreateWiki', 'CloudFlare FAILED to add CNAME for ' . $domainPrefix . '.orain.org' );
+			} else {
+				wfDebugLog( 'CreateWiki', 'CloudFlare CNAME added for ' . $domainPrefix . '.orain.org' );
+			}
 		}
 
 		// Create local account for founder (hack)
