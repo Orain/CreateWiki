@@ -536,7 +536,7 @@ class cloudflare_api
 	{
 		switch ($type) {
 			case 'USER':
-				$data['u']   = $this->email;
+				$data['email']   = $this->email;
 				$data['tkn'] = $this->token_key;
 				break;
 			case 'HOST':
