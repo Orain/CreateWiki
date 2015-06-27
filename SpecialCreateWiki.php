@@ -113,6 +113,9 @@ class SpecialCreateWiki extends SpecialPage {
 		global $wgCreateWikiSQLfiles, $IP;
 		$DBname = $formData['dbname'];
 		$founderName = $formData['founder'];
+		
+		wfDebugLog( 'CreateWiki', 'Creating wiki ' . $DBname . ' with a founder of ' . $founderName );
+		
 		$dbw = wfGetDB( DB_MASTER );
 
 		$dbTest = $dbw->query( 'SHOW DATABASES LIKE ' . $dbw->addQuotes( $DBname ) . ';' );
@@ -161,11 +164,14 @@ class SpecialCreateWiki extends SpecialPage {
 			} else {
 				wfDebugLog( 'CreateWiki', 'CloudFlare CNAME added for ' . $domainPrefix . '.orain.org' );
 			}
+		} else {
+			wfDebugLog( 'CreateWiki', 'CloudFlare is not enabled.' );
 		}
 
 		// Create local account for founder (hack)
 		$out = exec( "php5 $IP/extensions/CentralAuth/maintenance/createLocalAccount.php " . escapeshellarg( $founderName ) . ' --wiki ' . escapeshellarg( $DBname ) );
 		if ( !strpos( $out, 'created' ) ) {
+			wfDebugLog( 'CreateWiki', 'Failed to create local account for founder.' );
 			return wfMessage( 'createwiki-error-usernotcreated' )->plain();
 		}
 
@@ -177,6 +183,7 @@ class SpecialCreateWiki extends SpecialPage {
 		$founderUser->invalidateCache();
 
 		$form->getOutput()->addWikiMsg( 'createwiki-success', $DBname );
+		wfDebugLog( 'CreateWiki', 'Successfully created ' . $DBname . ' with a founder of ' . $founderName );
 		return true;
 	}
 
