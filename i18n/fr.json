@@ -1,0 +1,24 @@
+{
+	"@metadata": {
+		"authors": [
+			"Reception123",
+		]
+	},
+	"action-createwiki": "créer un wiki",
+	"createwiki": "Créer un wiki",
+	"createwiki-desc": "Créer un nouveaux wiki sur la ferme des wikis",
+	"createwiki-label-comment": "Commentaire",
+	"createwiki-label-create": "Créer",
+	"createwiki-label-dbname": "Nom de base",
+	"createwiki-label-founder": "Fondateur",
+	"createwiki-label-dbnamecontainsuppercase": "Le nom de base ne doit pas contenir des majuscules.",
+	"createwiki-error-dbexists": "Ce nom existe deja",
+	"createwiki-error-nonexistentfounder": "Le fondateur n'existe pas sur Orain Meta.",
+	"createwiki-error-notsuffixed": "Le nom de base doit etre en suffix configure",
+	"createwiki-error-notalnum": "Le nom du base doit etre alphanumerique",
+	"createwiki-error-usernotcreated": "Il y a eu un error pour creer le fondateur",
+	"createwiki-success": "$1 a ete creer avec succes.",
+	"log-description-farmer": "Ceci est un log des changements fait sur la ferme des wikis",
+	"log-name-farmer": "Log des fermes",
+	"logentry-farmer-create": "$1 a creer le fixi \"$4\"",
+	"logentry-farmer-createandpromote": "$1 a creer le wiki \"$4\" avec \"$5\" comme fondateur"
