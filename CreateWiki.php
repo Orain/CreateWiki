@@ -20,7 +20,7 @@ if ( !isset( $wgCreateWikiPublicDbListLocation ) ||
 	!isset( $wgCreateWikiPrivateDbListLocation ) ||
 	!isset( $wgCreateWikiBaseDomain )
 ) {
-	wfDebugLog( 'CreateWiki', 'Extension not loaded as config incorrect' );
+	trigger_error( "CreateWiki Extension not loaded as config incorrect", E_WARNING  );
 	return;
 }
 
