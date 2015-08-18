@@ -163,10 +163,10 @@ class SpecialCreateWiki extends SpecialPage {
 		}
 
 		// Update onwiki db list if one is set
-		global $wgCreateWikiPublicDbListTitle;
-		global $wgCreateWikiPrivateDbListTitle;
-		if( is_string( $wgCreateWikiPublicDbListTitle ) ||
-			is_string( $wgCreateWikiPrivateDbListTitle ) ) {
+		global $wgCreateWikiPublicDbListPageId;
+		global $wgCreateWikiPrivateDbListPageId;
+		if( is_int( $wgCreateWikiPublicDbListPageId ) ||
+			is_int( $wgCreateWikiPrivateDbListPageId ) ) {
 			$this->writeToDBlistPage( $DBname, $sitename, $language, $private );
 		}
 
@@ -319,22 +319,15 @@ class SpecialCreateWiki extends SpecialPage {
 	 * @return string the dbline that was added
 	 */
 	public function writeToDBlistPage( $DBname, $sitename, $language, $private ) {
-		global $wgCreateWikiPublicDbListTitle;
-		global $wgCreateWikiPrivateDbListTitle;
+		global $wgCreateWikiPublicDbListPageId;
+		global $wgCreateWikiPrivateDbListPageId;
 
-		$publicTitle = Title::newFromText( $wgCreateWikiPublicDbListTitle );
-		if ( !$publicTitle instanceof Title ) {
-			throw new MWException( 'CreateWiki getting public title failed: ' . $wgCreateWikiPublicDbListTitle );
-		}
-		if( !$publicTitle->exists() ) {
-			throw new MWException( 'CreateWiki public title does not exist: ' . $publicTitle->getText() );
-		}
-		$publicArticle = WikiPage::factory( $publicTitle );
+		$publicArticle = WikiPage::newFromID( $wgCreateWikiPublicDbListPageId );
 		if ( !$publicArticle instanceof WikiPage ) {
 			throw new MWException( 'CreateWiki getting public page failed' );
 		}
 		if( !$publicArticle->exists() ) {
-			throw new MWException( 'CreateWiki public article does not exist: ' . $publicTitle->getText() );
+			throw new MWException( 'CreateWiki public article does not exist' );
 		}
 		$publicContent = $publicArticle->getContent( Revision::RAW );
 		if ( !$publicContent instanceof Content ) {
@@ -354,13 +347,12 @@ class SpecialCreateWiki extends SpecialPage {
 		);
 
 		if ( $private !== 0 ) {
-			$privateTitle = Title::newFromText( $wgCreateWikiPrivateDbListTitle );
-			if ( !$privateTitle instanceof Title ) {
-				throw new MWException( 'CreateWiki getting private title failed' );
-			}
-			$privateArticle = WikiPage::factory( $privateTitle );
+			$privateArticle = WikiPage::newFromID( $wgCreateWikiPrivateDbListPageId );
 			if ( !$privateArticle instanceof WikiPage ) {
 				throw new MWException( 'CreateWiki getting private page failed' );
+			}
+			if( !$privateArticle->exists() ) {
+				throw new MWException( 'CreateWiki private article does not exist' );
 			}
 			$privateContent = $privateArticle->getContent( Revision::RAW );
 			if ( !$privateContent instanceof Content ) {
