@@ -322,8 +322,19 @@ class SpecialCreateWiki extends SpecialPage {
 		global $wgCreateWikiPublicDbListTitle;
 		global $wgCreateWikiPrivateDbListTitle;
 
-		$publicArticle = WikiPage::factory( Title::newFromText( $wgCreateWikiPublicDbListTitle ) );
-		$publicDbList = explode( "\n", $publicArticle->getContent()->getNativeData() );
+		$publicTitle = Title::newFromText( $wgCreateWikiPublicDbListTitle );
+		if ( !$publicTitle instanceof Title ) {
+			throw new MWException( 'CreateWiki getting public title failed' );
+		}
+		$publicArticle = WikiPage::factory( $publicTitle );
+		if ( !$publicArticle instanceof WikiPage ) {
+			throw new MWException( 'CreateWiki getting public page failed' );
+		}
+		$publicContent = $publicArticle->getContent();
+		if ( !$publicContent instanceof Content ) {
+			throw new MWException( 'CreateWiki getting public content failed' );
+		}
+		$publicDbList = explode( "\n", $publicContent->getNativeData() );
 		$publicDbLine = "$DBname|$sitename|$language|";
 		if ( $private ) {
 			$publicDbLine .= '|private';
@@ -337,8 +348,19 @@ class SpecialCreateWiki extends SpecialPage {
 		);
 
 		if ( $private !== 0 ) {
-			$privateArticle = WikiPage::factory( Title::newFromText( $wgCreateWikiPrivateDbListTitle ) );
-			$privateDbList = explode( "\n", $privateArticle->getContent()->getNativeData() );
+			$privateTitle = Title::newFromText( $wgCreateWikiPrivateDbListTitle );
+			if ( !$privateTitle instanceof Title ) {
+				throw new MWException( 'CreateWiki getting private title failed' );
+			}
+			$privateArticle = WikiPage::factory( $privateTitle );
+			if ( !$privateArticle instanceof WikiPage ) {
+				throw new MWException( 'CreateWiki getting private page failed' );
+			}
+			$privateContent = $privateArticle->getContent();
+			if ( !$privateContent instanceof Content ) {
+				throw new MWException( 'CreateWiki getting private content failed' );
+			}
+			$privateDbList = explode( "\n", $privateContent->getNativeData() );
 			$privateDbList[] = $DBname;
 			sort( $privateDbList );
 
