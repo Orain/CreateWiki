@@ -11,6 +11,8 @@ class SpecialRequestWiki extends SpecialPage {
 	}
 
 	function execute( $par ) {
+		efCreateWikiExceptionOnBadConfig();
+
 		$request = $this->getRequest();
 		$out = $this->getOutput();
 		$this->setHeaders();

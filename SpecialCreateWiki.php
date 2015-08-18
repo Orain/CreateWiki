@@ -30,6 +30,8 @@ class SpecialCreateWiki extends SpecialPage {
 	}
 
 	public function execute( $par ) {
+		efCreateWikiExceptionOnBadConfig();
+
 		$request = $this->getRequest();
 		$out = $this->getOutput();
 		$this->setHeaders();

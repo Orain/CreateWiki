@@ -15,13 +15,13 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * $wgCloudFlareKey = 'bar';
  */
 
-// If the extension doen't appear to be configured correctly then die :/
-if ( !isset( $wgCreateWikiPublicDbListLocation ) ||
-	!isset( $wgCreateWikiPrivateDbListLocation ) ||
-	!isset( $wgCreateWikiBaseDomain )
-) {
-	trigger_error( "CreateWiki Extension not loaded as config incorrect", E_WARNING  );
-	return;
+// Hack function to throw Exception on bad config
+function efCreateWikiExceptionOnBadConfig() {
+	if( !isset( $wgCreateWikiPublicDbListLocation ) ||
+		!isset( $wgCreateWikiPrivateDbListLocation ) ||
+		!isset( $wgCreateWikiBaseDomain ) ) {
+		throw new Exception( 'CreateWiki config doesn\'t appear to be correct' );
+	}
 }
 
 $wgExtensionCredits['specialpage'][] = array(
