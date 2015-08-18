@@ -154,6 +154,8 @@ class SpecialCreateWiki extends SpecialPage {
 
 		$this->writeToDBlist( $DBname, $sitename, $language, $private );
 
+		$this->addCloudFlareRecordIfEnabled( $DBname );
+
 		$shcreateaccount =
 			exec(
 				"/usr/bin/php $IP/extensions/CentralAuth/maintenance/createLocalAccount.php " .
@@ -328,5 +330,30 @@ class SpecialCreateWiki extends SpecialPage {
 			'Create main page',
 			EDIT_NEW
 		);
+	}
+
+	/**
+	 * @param string $DBname
+	 */
+	public function addCloudFlareRecordIfEnabled( $DBname ) {
+		global $wgCreateWikiUseCloudFlare, $wgCloudFlareUser, $wgCloudFlareKey, $wgCreateWikiBaseDomain;
+
+		if ( $wgCreateWikiUseCloudFlare ) {
+			$domainPrefix = substr( $DBname, 0, -4 );
+			$cloudFlare = new cloudflare_api( $wgCloudFlareUser, $wgCloudFlareKey );
+			$cloudFlareResult = $cloudFlare->rec_new(
+				$wgCreateWikiBaseDomain,
+				'CNAME',
+				$domainPrefix,
+				'lb.' . $wgCreateWikiBaseDomain
+			);
+			if( !is_object( $cloudFlareResult ) || $cloudFlareResult->result !== 'success' ) {
+				wfDebugLog( 'CreateWiki', 'CloudFlare FAILED to add CNAME for ' . $domainPrefix );
+			} else {
+				wfDebugLog( 'CreateWiki', 'CloudFlare CNAME added for ' . $domainPrefix );
+			}
+		} else {
+			wfDebugLog( 'CreateWiki', 'CloudFlare is not enabled.' );
+		}
 	}
 }

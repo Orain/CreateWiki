@@ -10,7 +10,12 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * $wgCreateWikiPublicDbListLocation = "/srv/foo/dblist.public";
  * $wgCreateWikiPrivateDbListLocation = "/srv/foo/dblist.private";
  * $wgCreateWikiBaseDomain = 'orain.org'
+ * $wgCreateWikiUseCloudFlare = true;
+ * $wgCloudFlareUser = 'foo';
+ * $wgCloudFlareKey = 'bar';
  */
+
+// If the extension doen't appear to be configured correctly then die :/
 if ( !isset( $wgCreateWikiPublicDbListLocation ) ||
 	!isset( $wgCreateWikiPrivateDbListLocation ) ||
 	!isset( $wgCreateWikiBaseDomain )
@@ -26,6 +31,7 @@ $wgExtensionCredits['specialpage'][] = array(
 	'url' => '//github.com/Orain/CreateWiki'
 );
 
+$wgAutoloadClasses['cloudflare_api'] = __DIR__ . '/lib/class_cloudflare.php';
 $wgAutoloadClasses['SpecialCreateWiki'] = __DIR__ . '/SpecialCreateWiki.php';
 $wgAutoloadClasses['CreateWikiHooks'] = __DIR__ . '/CreateWiki.hooks.php';
 $wgAutoloadClasses['RequestWikiQueuePager'] = __DIR__ . '/RequestWikiQueuePager.php';

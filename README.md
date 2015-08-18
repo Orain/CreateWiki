@@ -10,6 +10,9 @@ Based on the CheckUser extension by Tim Starling and Aaron Schulz.
     $wgCreateWikiPublicDbListLocation = "/srv/foo/dblist.public";
     $wgCreateWikiPrivateDbListLocation = "/srv/foo/dblist.private";
     $wgCreateWikiBaseDomain = 'orain.org'
+    $wgCreateWikiUseCloudFlare = true;
+    $wgCloudFlareUser = 'foo';
+    $wgCloudFlareKey = 'bar';
 
 #### Notes
  - This extension requires php to be loacted at */usr/bin/php*.
