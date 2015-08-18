@@ -18,6 +18,11 @@
  * along with CreateWiki. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @author Kudu
+ * @author Southparkfan
+ * @author JohnFLewis
+ */
 class SpecialCreateWiki extends SpecialPage {
 
 	public function __construct() {
@@ -25,113 +30,115 @@ class SpecialCreateWiki extends SpecialPage {
 	}
 
 	public function execute( $par ) {
-		$this->checkPermissions();
+		$request = $this->getRequest();
+		$out = $this->getOutput();
 		$this->setHeaders();
 
-		$form = new HTMLForm( array(
-				'dbname' => array(
-					'default' => $par, // e.g. Special:CreateWiki/enwiki
-					'filter-callback' => array( 'SpecialCreateWiki', 'filter' ),
-					'label-message' => 'createwiki-label-dbname',
-					'maxlength' => 30,
-					'required' => true,
-					'size' => 30,
-					'type' => 'text',
-					'validation-callback' => array( 'SpecialCreateWiki', 'validateDBname' ),
-				),
-				'founder' => array(
-					'filter-callback' => array( 'SpecialCreateWiki', 'filter' ),
-					'label-message' => 'createwiki-label-founder',
-					'required' => true,
-					'size' => 30,
-					'type' => 'text',
-					'validation-callback' => array( 'SpecialCreateWiki', 'validateFounder' ),
-				),
-				'comment' => array(
-					'label-message' => 'createwiki-label-comment',
-					'maxlength' => 79,
-					'size' => 79,
-					'type' => 'text',
-			 	),
-			)
-		);
-		$form->setSubmitTextMsg( 'createwiki-label-create' );
-		$form->setTitle( $this->getPageTitle() );
-		$form->setSubmitCallback( array( 'SpecialCreateWiki', 'processInput' ) );
-		$form->show();
+		$this->showInputForm();
+
+		if ( $request->wasPosted() ) {
+			$this->handleInput();
+		}
 	}
 
-	public static function filter( $string, $allData ) {
-		return trim( $string );
+	public function showInputForm() {
+		$localpage = $this->getPageTitle()->getLocalUrl();
+		$request = $this->getRequest();
+		$language = $request->getVal( 'cwLanguage' ) ? $request->getVal( 'cwLanguage' ) : 'en';
+		$privateboxchecked = $request->getVal( 'cwPrivate' );
+
+		$form = Xml::openElement( 'form', array( 'action' => $localpage, 'method' => 'post' ) );
+		$form .= '<fieldset><legend>' . $this->msg( 'createwiki' )->escaped() . '</legend>';
+		$form .= Xml::openElement( 'table' );
+		$form .= '<tr><td>' . $this->msg( 'createwiki-label-dbname' )->escaped() . '</td>';
+		$form .= '<td>' .
+			Xml::input(
+				'cwDBname',
+				20,
+				$request->getVal( 'cwDBname' ),
+				array( 'required' => '' )
+			) .
+			'</td></tr>';
+		$form .= '<tr><td>' . $this->msg( 'createwiki-label-founder' )->escaped() . '</td>';
+		$form .= '<td>' .
+			Xml::input(
+				'cwFounder',
+				20,
+				$request->getVal( 'cwFounder' ),
+				array( 'required' => '' )
+			) .
+			'</td></tr>';
+		$form .= '<tr><td>' . $this->msg( 'createwiki-label-sitename' )->escaped() . '</td>';
+		$form .= '<td>' .
+			Xml::input(
+				'cwSitename',
+				20,
+				$request->getVal( 'cwSitename' ),
+				array( 'required' => '' )
+			) .
+			'</td></tr>';
+		$form .= '<tr><td>' . $this->msg( 'createwiki-label-language' )->escaped() . '</td>';
+		$form .= '<td>' .
+			Xml::languageSelector( $language, true, null, array( 'name' => 'cwLanguage' ) )[1] .
+			'</td></tr>';
+		$form .= '<tr><td>' . $this->msg( 'createwiki-label-private' )->escaped() . '</td>';
+		$form .= '<td>' .
+			Xml::check( 'cwPrivate', $privateboxchecked, array( 'value' => 0 ) ) .
+			'</td></tr>';
+		$form .= '<tr><td>' . $this->msg( 'createwiki-label-reason' )->escaped() . '</td>';
+		$form .= '<td>' .
+			Xml::input(
+				'cwReason',
+				45,
+				$request->getVal( 'cwReason' ),
+				array( 'required' => '' )
+			) .
+			'</td></tr>';
+		$form .= '<tr><td>' .
+			Xml::submitButton( $this->msg( 'createwiki-label-submit' )->plain() ) .
+			'</td></tr>';
+		$form .= Xml::closeElement( 'table' );
+		$form .= '</fieldset>';
+		$form .= Html::hidden( 'cwToken', $this->getUser()->getEditToken() );
+		$form .= Xml::closeElement( 'form' );
+
+		$this->getOutput()->addHTML( $form );
 	}
 
-	public static function validateDBname( $DBname, $allData ) {
-		global $wgConf;
+	public function handleInput() {
+		global $IP, $wgCreateWikiSQLfiles;
 
-		$suffixed = false;
-		foreach ( $wgConf->suffixes as $suffix ) {
-			if ( substr( $DBname, -strlen( $suffix ) ) === $suffix ) {
-				$suffixed = true;
-				break;
-			}
-		}
+		$request = $this->getRequest();
+		$out = $this->getOutput();
 
-		if ( !$suffixed ) {
-			return wfMessage( 'createwiki-error-notsuffixed' )->plain();
-		}
+		$DBname = trim( $request->getVal( 'cwDBname' ) );
+		$founder = trim( $request->getVal( 'cwFounder' ) );
+		$sitename = trim( $request->getVal( 'cwSitename' ) );
+		$reason = $request->getVal( 'cwReason' );
+		$language = $request->getVal( 'cwLanguage' );
+		$private = is_null( $request->getVal( 'cwPrivate' ) ) ? 0 : 1;
 
-		if ( !ctype_alnum( $DBname ) ) {
-			return wfMessage( 'createwiki-error-notalnum' )->plain();
-		}
-
-		if ( strtolower( $DBname ) != $DBname ) {
-			return wfMessage( 'createwiki-label-dbnamecontainsuppercase' )->plain();
-		}
-
-		return true;
-	}
-
-	public static function validateFounder( $founderName, $allData ) {
-		$user = User::newFromName( $founderName );
-		if ( !$user->getId() ) {
-			return wfMessage( 'createwiki-error-nonexistentfounder' )->plain();
-		}
-		return true;
-	}
-
-	/**
-	 * @param array $formData
-	 * @param HtmlForm $form
-	 *
-	 * @return bool|string
-	 * @throws DBUnexpectedError
-	 * @throws Exception
-	 * @throws MWException
-	 */
-	public static function processInput( array $formData, HtmlForm $form ) {
-		error_reporting( 0 );
-		global $wgCreateWikiSQLfiles, $IP;
-		$DBname = $formData['dbname'];
-		$founderName = $formData['founder'];
-		
-		wfDebugLog( 'CreateWiki', 'Creating wiki ' . $DBname . ' with a founder of ' . $founderName );
-		
 		$dbw = wfGetDB( DB_MASTER );
 
-		$dbTest = $dbw->query( 'SHOW DATABASES LIKE ' . $dbw->addQuotes( $DBname ) . ';' );
-		$rows = $dbTest->numRows();
-		$dbTest->free();
-		if ( $rows !== 0 ) {
-			return wfMessage( 'createwiki-error-dbexists' )->plain();
+		if ( !$this->getUser()->matchEditToken( $request->getVal( 'cwToken' ) ) ) {
+			$out->addWikiMsg( 'createwiki-error-csrf' );
+
+			return false;
 		}
 
-		$farmerLogEntry = new ManualLogEntry( 'farmer', 'createandpromote' );
-		$farmerLogEntry->setPerformer( $form->getUser() );
-		$farmerLogEntry->setTarget( $form->getTitle() );
-		$farmerLogEntry->setComment( $formData['comment'] );
-		$farmerLogEntry->setParameters( array(
+		$validation = $this->validateInput( $DBname, $founder );
+
+		if ( !$validation ) {
+			return false;
+		}
+
+		$farmerLogEntry = new ManualLogEntry( 'farmer', 'createwiki' );
+		$farmerLogEntry->setPerformer( $this->getUser() );
+		$farmerLogEntry->setTarget( $this->getTitle() );
+		$farmerLogEntry->setComment( $reason );
+		$farmerLogEntry->setParameters(
+			array(
 				'4::wiki' => $DBname,
-				'5::founder' => $founderName,
 			)
 		);
 		$farmerLogID = $farmerLogEntry->insert();
@@ -141,50 +148,184 @@ class SpecialCreateWiki extends SpecialPage {
 		$dbw->query( 'CREATE DATABASE ' . $dbw->addIdentifierQuotes( $DBname ) . ';' );
 		$dbw->selectDB( $DBname );
 
-		foreach ( $wgCreateWikiSQLfiles as $file ) {
-			$dbw->sourceFile( $file );
+		foreach ( $wgCreateWikiSQLfiles as $sqlfile ) {
+			$dbw->sourceFile( $sqlfile );
 		}
 
-		$dbw->insert( 'site_stats', array( 'ss_row_id' => 1 ) );
-		$dbw->close();
+		$this->writeToDBlist( $DBname, $sitename, $language, $private );
 
-		// Add DNS record to cloudflare
-		global $wgCreateWikiUseCloudFlare, $wgCloudFlareUser, $wgCloudFlareKey;
-		if ( $wgCreateWikiUseCloudFlare ) {
-			$domainPrefix = substr( $DBname, 0, -4 );
-			$cloudFlare = new cloudflare_api( $wgCloudFlareUser, $wgCloudFlareKey );
-			$cloudFlareResult = $cloudFlare->rec_new(
-				'orain.org',
-				'CNAME',
-				$domainPrefix,
-				'lb.orain.org'
+		$shcreateaccount =
+			exec(
+				"/usr/bin/php $IP/extensions/CentralAuth/maintenance/createLocalAccount.php " .
+				wfEscapeShellArg( $founder ) .
+				' --wiki ' .
+				wfEscapeShellArg( $DBname )
 			);
-			if( !is_object( $cloudFlareResult ) || $cloudFlareResult->result !== 'success' ) {
-				wfDebugLog( 'CreateWiki', 'CloudFlare FAILED to add CNAME for ' . $domainPrefix . '.orain.org' );
-			} else {
-				wfDebugLog( 'CreateWiki', 'CloudFlare CNAME added for ' . $domainPrefix . '.orain.org' );
-			}
-		} else {
-			wfDebugLog( 'CreateWiki', 'CloudFlare is not enabled.' );
+		if ( !strpos( $shcreateaccount, 'created' ) ) {
+			wfDebugLog(
+				'CreateWiki',
+				'Failed to create local account for founder. - error: ' . $shcreateaccount
+			);
+
+			$out->addHTML(
+				'<div class="errorbox">' .
+				$this->msg( 'createwiki-error-usernotcreated' )->escaped() .
+				'</div>'
+			);
+
+			return false;
 		}
 
-		// Create local account for founder (hack)
-		$out = exec( "php5 $IP/extensions/CentralAuth/maintenance/createLocalAccount.php " . escapeshellarg( $founderName ) . ' --wiki ' . escapeshellarg( $DBname ) );
-		if ( !strpos( $out, 'created' ) ) {
-			wfDebugLog( 'CreateWiki', 'Failed to create local account for founder.' );
-			return wfMessage( 'createwiki-error-usernotcreated' )->plain();
+		$shpromoteaccount =
+			exec(
+				"/usr/bin/php $IP/maintenance/createAndPromote.php " .
+				wfEscapeShellArg( $founder ) .
+				' --bureaucrat --sysop --force --wiki ' .
+				wfEscapeShellArg( $DBname )
+			);
+		if ( !strpos( $shpromoteaccount, 'done.' ) ) {
+			wfDebugLog(
+				'CreateWiki',
+				'Failed to promote local account for founder. - error: ' . $shpromoteaccount
+			);
+
+			$out->addHTML(
+				'<div class="errorbox">' .
+				$this->msg( 'createwiki-error-usernotpromoted' )->escaped() .
+				'</div>'
+			);
+
+			return false;
 		}
 
-		require_once( "$IP/includes/UserRightsProxy.php" );
+		$this->createMainPage( $language );
+
 		// Grant founder sysop and bureaucrat rights
-		$founderUser = UserRightsProxy::newFromName( $DBname, $founderName );
+		$founderUser =
+			UserRightsProxy::newFromName( $DBname, User::newFromName( $founder )->getName() );
 		$newGroups = array( 'sysop', 'bureaucrat' );
 		array_map( array( $founderUser, 'addGroup' ), $newGroups );
-		$founderUser->invalidateCache();
 
-		$form->getOutput()->addWikiMsg( 'createwiki-success', $DBname );
-		wfDebugLog( 'CreateWiki', 'Successfully created ' . $DBname . ' with a founder of ' . $founderName );
+		$out->addHTML(
+			'<div class="successbox">' . $this->msg( 'createwiki-success' )->escaped() . '</div>'
+		);
+
 		return true;
 	}
 
+	public function validateInput( $DBname, $founder ) {
+		$out = $this->getOutput();
+
+		$user = User::newFromName( $founder );
+		if ( !$user->getId() ) {
+			$out->addHTML(
+				'<div class="errorbox">' .
+				$this->msg( 'createwiki-error-foundernonexistent' )->escaped() .
+				'</div>'
+			);
+
+			return false;
+		}
+
+		if ( !$this->validateDBname( $DBname ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	public function validateDBname( $DBname ) {
+		global $wgConf;
+		$out = $this->getOutput();
+
+		$suffixed = false;
+		foreach ( $wgConf->suffixes as $suffix ) {
+			if ( substr( $DBname, -strlen( $suffix ) ) === $suffix ) {
+				$suffixed = true;
+				break;
+			}
+		}
+
+		$dbw = wfGetDB( DB_MASTER );
+		$res = $dbw->query( 'SHOW DATABASES LIKE ' . $dbw->addQuotes( $DBname ) . ';' );
+
+		if ( $res->numRows() !== 0 ) {
+			$out->addHTML(
+				'<div class="errorbox">' .
+				$this->msg( 'createwiki-error-dbexists' )->escaped() .
+				'</div>'
+			);
+
+			return false;
+		}
+
+		if ( !$suffixed ) {
+			$out->addHTML(
+				'<div class="errorbox">' .
+				$this->msg( 'createwiki-error-notsuffixed' )->escaped() .
+				'</div>'
+			);
+
+			return false;
+		}
+
+		if ( !ctype_alnum( $DBname ) ) {
+			$out->addHTML(
+				'<div class="errorbox">' .
+				$this->msg( 'createwiki-error-notalnum' )->escaped() .
+				'</div>'
+			);
+
+			return false;
+		}
+
+		if ( strtolower( $DBname ) !== $DBname ) {
+			$out->addHTML(
+				'<div class="errorbox">' .
+				$this->msg( 'createwiki-error-notlowercase' )->escaped() .
+				'</div>'
+			);
+
+			return false;
+		}
+
+		return true;
+	}
+
+	public function writeToDBlist( $DBname, $sitename, $language, $private ) {
+		global $IP;
+
+		$dbline = "$DBname|$sitename|$language|\n";
+		file_put_contents( "/srv/mediawiki/dblist/all.dblist", $dbline, FILE_APPEND | LOCK_EX );
+
+		if ( $private !== 0 ) {
+			file_put_contents(
+				"/srv/mediawiki/dblist/private.dblist",
+				"$DBname\n",
+				FILE_APPEND | LOCK_EX
+			);
+		}
+
+		return true;
+	}
+
+	public function createMainPage( $lang ) {
+		// Don't use Meta's mainpage message!
+		if ( $lang !== 'en' ) {
+			$page = wfMessage( 'mainpage' )->inLanguage( $lang )->plain();
+		} else {
+			$page = 'Main_Page';
+		}
+
+		$title = Title::newFromText( $page );
+		$article = WikiPage::factory( $title );
+
+		$article->doEditContent(
+			new WikitextContent(
+				wfMessage( 'createwiki-defaultmainpage' )->inLanguage( $lang )->plain()
+			),
+			'Create main page',
+			EDIT_NEW
+		);
+	}
 }
