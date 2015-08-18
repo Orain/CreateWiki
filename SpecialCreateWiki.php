@@ -154,7 +154,7 @@ class SpecialCreateWiki extends SpecialPage {
 			$dbw->sourceFile( $sqlfile );
 		}
 
-		$this->writeToDBlist( $DBname, $sitename, $language, $private );
+		$dbline = $this->writeToDBlist( $DBname, $sitename, $language, $private );
 
 		$this->addCloudFlareRecordIfEnabled( $DBname );
 
@@ -212,6 +212,10 @@ class SpecialCreateWiki extends SpecialPage {
 
 		$out->addHTML(
 			'<div class="successbox">' . $this->msg( 'createwiki-success' )->escaped() . '</div>'
+		);
+
+		$out->addHTML(
+			'<div class="createwiki-dbline"><p>' . $dbline . '</p></div>'
 		);
 
 		return true;
@@ -296,6 +300,14 @@ class SpecialCreateWiki extends SpecialPage {
 		return true;
 	}
 
+	/**
+	 * @param $DBname
+	 * @param $sitename
+	 * @param $language
+	 * @param $private
+	 *
+	 * @return string the dbline that was added
+	 */
 	public function writeToDBlist( $DBname, $sitename, $language, $private ) {
 		global $IP;
 		global $wgCreateWikiPublicDbListLocation, $wgCreateWikiPrivateDbListLocation;
@@ -311,7 +323,7 @@ class SpecialCreateWiki extends SpecialPage {
 			);
 		}
 
-		return true;
+		return $dbline;
 	}
 
 	public function createMainPage( $lang ) {
