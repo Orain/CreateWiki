@@ -20,7 +20,8 @@ if ( !isset( $wgCreateWikiPublicDbListLocation ) ||
 	!isset( $wgCreateWikiPrivateDbListLocation ) ||
 	!isset( $wgCreateWikiBaseDomain )
 ) {
-	throw new Exception( 'CreateWiki not configured correctly!' );
+	wfDebugLog( 'CreateWiki', 'Extension not loaded as config incorrect' );
+	return;
 }
 
 $wgExtensionCredits['specialpage'][] = array(
