@@ -7,10 +7,14 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * // Example configuration
  * // These should be set before the extension is loaded......
  *
- * $wgCreateWikiPublicDbListLocation = null;
- * $wgCreateWikiPrivateDbListLocation = null;
+ * $wgCreateWikiPublicDbListLocation = "/srv/foo/dblist.public";
+ * $wgCreateWikiPrivateDbListLocation = "/srv/foo/dblist.private";
+ * $wgCreateWikiBaseDomain = 'orain.org'
  */
-if( !isset( $wgCreateWikiPublicDbListLocation ) || !isset( $wgCreateWikiPrivateDbListLocation ) ) {
+if ( !isset( $wgCreateWikiPublicDbListLocation ) ||
+	!isset( $wgCreateWikiPrivateDbListLocation ) ||
+	!isset( $wgCreateWikiBaseDomain )
+) {
 	throw new Exception( 'CreateWiki not configured correctly!' );
 }
 

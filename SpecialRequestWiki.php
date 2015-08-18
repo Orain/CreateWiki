@@ -50,13 +50,15 @@ class SpecialRequestWiki extends SpecialPage {
 	}
 
 	function addRequestWikiForm() {
+		global $wgCreateWikiBaseDomain;
+
 		$localpage = $this->getPageTitle()->getLocalUrl();
 
 		$form = Xml::openElement( 'form', array( 'action' => $localpage, 'method' => 'post' ) );
 		$form .= '<fieldset><legend>' . $this->msg( 'requestwiki' )->escaped() . '</legend>';
 		$form .= Xml::openElement( 'table' );
 		$form .= '<tr><td>' . $this->msg( 'requestwiki-label-siteurl' )->escaped() . '</td>';
-		$form .= '<td>' . Xml::input( 'subdomain', 20, '' ) . '.miraheze.org' . '</td></tr>';
+		$form .= '<td>' . Xml::input( 'subdomain', 20, '' ) . '.' . $wgCreateWikiBaseDomain . '</td></tr>';
 		$form .= '<tr><td>' . $this->msg( 'requestwiki-label-sitename' )->escaped() . '</td>';
 		$form .= '<td>' .
 			Xml::input( 'sitename', 20, '', array( 'required' => '' ) ) .
@@ -144,9 +146,11 @@ class SpecialRequestWiki extends SpecialPage {
 			return false;
 		}
 
+		global $wgCreateWikiBaseDomain;
+
 		// Make the subdomain a dbname
 		if ( $subdomain ) {
-			$url = strtolower( $subdomain ) . '.miraheze.org';
+			$url = strtolower( $subdomain ) . '.' . $wgCreateWikiBaseDomain;
 			$subdomain = strtolower( $subdomain ) . 'wiki';
 		} else {
 			$url = $customdomain;
