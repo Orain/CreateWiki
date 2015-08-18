@@ -22,6 +22,5 @@
 	"log-description-farmer": "The description of the wiki farm log.",
 	"log-name-farmer": "The name of the wiki farm log.",
 	"logentry-farmer-create": "The format of the log entry for wiki creation. Parameters:\n* $1 = user who created the wiki\n* $4 = database name",
-	"logentry-farmer-createandpromote": "The format of the log entry for wiki creation and founder promotion. Parameters:\n* $1 = user who created the wiki\n* $4 = database name\n* $5 = founder",
-	"createwiki-error-dbexists": "The error message displayed when the database already exists.",
+	"logentry-farmer-createandpromote": "The format of the log entry for wiki creation and founder promotion. Parameters:\n* $1 = user who created the wiki\n* $4 = database name\n* $5 = founder"
 }
