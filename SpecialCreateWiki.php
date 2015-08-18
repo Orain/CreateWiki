@@ -159,10 +159,16 @@ class SpecialCreateWiki extends SpecialPage {
 		global $wgCreateWikiPrivateDbListLocation;
 		if( is_string( $wgCreateWikiPublicDbListLocation ) ||
 			is_string( $wgCreateWikiPrivateDbListLocation ) ) {
-			$this->writeToDBlist( $DBname, $sitename, $language, $private );
+			$this->writeToDBlistFile( $DBname, $sitename, $language, $private );
 		}
 
-		// TODO Update onwiki dblist if one is set
+		// Update onwiki db list if one is set
+		global $wgCreateWikiPublicDbListTitle;
+		global $wgCreateWikiPrivateDbListTitle;
+		if( is_string( $wgCreateWikiPublicDbListTitle ) ||
+			is_string( $wgCreateWikiPrivateDbListTitle ) ) {
+			$this->writeToDBlistPage( $DBname, $sitename, $language, $private );
+		}
 
 		$this->addCloudFlareRecordIfEnabled( $DBname );
 
@@ -312,7 +318,46 @@ class SpecialCreateWiki extends SpecialPage {
 	 *
 	 * @return string the dbline that was added
 	 */
-	public function writeToDBlist( $DBname, $sitename, $language, $private ) {
+	public function writeToDBlistPage( $DBname, $sitename, $language, $private ) {
+		global $wgCreateWikiPublicDbListTitle;
+		global $wgCreateWikiPrivateDbListTitle;
+
+		$publicArticle = WikiPage::factory( Title::newFromText( $wgCreateWikiPublicDbListTitle ) );
+		$publicDbList = explode( "\n", $publicArticle->getContent()->getNativeData() );
+		$publicDbLine = "$DBname|$sitename|$language|";
+		if ( $private ) {
+			$publicDbLine .= '|private';
+		}
+		$publicDbList[] = $publicDbLine;
+		sort( $publicDbList );
+
+		$publicArticle->doEditContent(
+			new WikitextContent( implode( "\n", $publicDbList ) ),
+			'CreateWiki - Add ' . $DBname . ' to db list'
+		);
+
+		if ( $private !== 0 ) {
+			$privateArticle = WikiPage::factory( Title::newFromText( $wgCreateWikiPrivateDbListTitle ) );
+			$privateDbList = explode( "\n", $privateArticle->getContent()->getNativeData() );
+			$privateDbList[] = $DBname;
+			sort( $privateDbList );
+
+			$privateArticle->doEditContent(
+				new WikitextContent( implode( "\n", $privateDbList ) ),
+				'CreateWiki - Add ' . $DBname . ' to private db list'
+			);
+		}
+	}
+
+	/**
+	 * @param $DBname
+	 * @param $sitename
+	 * @param $language
+	 * @param $private
+	 *
+	 * @return string the dbline that was added
+	 */
+	public function writeToDBlistFile( $DBname, $sitename, $language, $private ) {
 		global $IP;
 		global $wgCreateWikiPublicDbListLocation, $wgCreateWikiPrivateDbListLocation;
 
