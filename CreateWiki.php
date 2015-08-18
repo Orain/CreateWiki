@@ -17,10 +17,19 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 // Hack function to throw Exception on bad config
 function efCreateWikiExceptionOnBadConfig() {
-	if( !isset( $wgCreateWikiPublicDbListLocation ) ||
-		!isset( $wgCreateWikiPrivateDbListLocation ) ||
-		!isset( $wgCreateWikiBaseDomain ) ) {
-		throw new MWException( 'CreateWiki config doesn\'t appear to be correct' );
+	global $wgCreateWikiPublicDbListLocation;
+	global $wgCreateWikiPrivateDbListLocation;
+	global $wgCreateWikiBaseDomain;
+
+	if( !is_string( $wgCreateWikiPublicDbListLocation ) ||
+		!is_string( $wgCreateWikiPrivateDbListLocation ) ||
+		!is_string( $wgCreateWikiBaseDomain ) ) {
+		$details = array(
+			'$wgCreateWikiPublicDbListLocation' => $wgCreateWikiPublicDbListLocation,
+			'$wgCreateWikiPrivateDbListLocation' => $wgCreateWikiPrivateDbListLocation,
+			'$wgCreateWikiBaseDomain' => $wgCreateWikiBaseDomain,
+		);
+		throw new MWException( 'CreateWiki config doesn\'t appear to be correct: ' . $details );
 	}
 }
 
