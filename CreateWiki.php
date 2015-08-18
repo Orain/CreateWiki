@@ -3,6 +3,17 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 	exit( 1 );
 }
 
+/**
+ * // Example configuration
+ * // These should be set before the extension is loaded......
+ *
+ * $wgCreateWikiPublicDbListLocation = null;
+ * $wgCreateWikiPrivateDbListLocation = null;
+ */
+if( !isset( $wgCreateWikiPublicDbListLocation ) || !isset( $wgCreateWikiPrivateDbListLocation ) ) {
+	throw new Exception( 'CreateWiki not configured correctly!' );
+}
+
 $wgExtensionCredits['specialpage'][] = array(
 	'author' => 'Southparkfan & Kudu',
 	'descriptionmsg' => 'createwiki-desc',

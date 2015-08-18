@@ -294,13 +294,14 @@ class SpecialCreateWiki extends SpecialPage {
 
 	public function writeToDBlist( $DBname, $sitename, $language, $private ) {
 		global $IP;
+		global $wgCreateWikiPublicDbListLocation, $wgCreateWikiPrivateDbListLocation;
 
 		$dbline = "$DBname|$sitename|$language|\n";
-		file_put_contents( "/srv/mediawiki/dblist/all.dblist", $dbline, FILE_APPEND | LOCK_EX );
+		file_put_contents( $wgCreateWikiPublicDbListLocation, $dbline, FILE_APPEND | LOCK_EX );
 
 		if ( $private !== 0 ) {
 			file_put_contents(
-				"/srv/mediawiki/dblist/private.dblist",
+				$wgCreateWikiPrivateDbListLocation,
 				"$DBname\n",
 				FILE_APPEND | LOCK_EX
 			);
