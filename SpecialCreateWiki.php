@@ -330,7 +330,7 @@ class SpecialCreateWiki extends SpecialPage {
 		if ( !$publicArticle instanceof WikiPage ) {
 			throw new MWException( 'CreateWiki getting public page failed' );
 		}
-		$publicContent = $publicArticle->getContent();
+		$publicContent = $publicArticle->getContent( Revision::RAW );
 		if ( !$publicContent instanceof Content ) {
 			throw new MWException( 'CreateWiki getting public content failed' );
 		}
@@ -356,7 +356,7 @@ class SpecialCreateWiki extends SpecialPage {
 			if ( !$privateArticle instanceof WikiPage ) {
 				throw new MWException( 'CreateWiki getting private page failed' );
 			}
-			$privateContent = $privateArticle->getContent();
+			$privateContent = $privateArticle->getContent( Revision::RAW );
 			if ( !$privateContent instanceof Content ) {
 				throw new MWException( 'CreateWiki getting private content failed' );
 			}
