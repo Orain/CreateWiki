@@ -16,8 +16,12 @@ Based on the CheckUser extension by Tim Starling and Aaron Schulz.
 
 #### Notes
  - This extension requires php to be loacted at */usr/bin/php*.
- - This extension requires the CentralAuth extension to be installed.
  - This extension requires the mediawiki DB user to have *CREATE DATABASE* permissions.
+
+ - This extension requires the CentralAuth extension to be installed.
+ - This extension requires the AntiSpoof extension to be installed.
+ - This extension requires the AbuseFilter extension to be installed.
+ - This extension requires the CheckUser extension to be installed.
 
  #### TODOS
   - Optionally update a local version / onwiki version of the dblist
