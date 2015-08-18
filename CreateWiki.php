@@ -20,7 +20,7 @@ function efCreateWikiExceptionOnBadConfig() {
 	if( !isset( $wgCreateWikiPublicDbListLocation ) ||
 		!isset( $wgCreateWikiPrivateDbListLocation ) ||
 		!isset( $wgCreateWikiBaseDomain ) ) {
-		throw new Exception( 'CreateWiki config doesn\'t appear to be correct' );
+		throw new MWException( 'CreateWiki config doesn\'t appear to be correct' );
 	}
 }
 
