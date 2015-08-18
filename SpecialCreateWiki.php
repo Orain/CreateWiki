@@ -324,11 +324,17 @@ class SpecialCreateWiki extends SpecialPage {
 
 		$publicTitle = Title::newFromText( $wgCreateWikiPublicDbListTitle );
 		if ( !$publicTitle instanceof Title ) {
-			throw new MWException( 'CreateWiki getting public title failed' );
+			throw new MWException( 'CreateWiki getting public title failed: ' . $wgCreateWikiPublicDbListTitle );
+		}
+		if( !$publicTitle->exists() ) {
+			throw new MWException( 'CreateWiki public title does not exist: ' . $publicTitle->getText() );
 		}
 		$publicArticle = WikiPage::factory( $publicTitle );
 		if ( !$publicArticle instanceof WikiPage ) {
 			throw new MWException( 'CreateWiki getting public page failed' );
+		}
+		if( !$publicArticle->exists() ) {
+			throw new MWException( 'CreateWiki public article does not exist: ' . $publicTitle->getText() );
 		}
 		$publicContent = $publicArticle->getContent( Revision::RAW );
 		if ( !$publicContent instanceof Content ) {
