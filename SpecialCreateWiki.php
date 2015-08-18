@@ -154,7 +154,15 @@ class SpecialCreateWiki extends SpecialPage {
 			$dbw->sourceFile( $sqlfile );
 		}
 
-		$dbline = $this->writeToDBlist( $DBname, $sitename, $language, $private );
+		// Update a local dblist if one is set
+		global $wgCreateWikiPublicDbListLocation;
+		global $wgCreateWikiPrivateDbListLocation;
+		if( is_string( $wgCreateWikiPublicDbListLocation ) ||
+			is_string( $wgCreateWikiPrivateDbListLocation ) ) {
+			$this->writeToDBlist( $DBname, $sitename, $language, $private );
+		}
+
+		// TODO Update onwiki dblist if one is set
 
 		$this->addCloudFlareRecordIfEnabled( $DBname );
 
@@ -212,10 +220,6 @@ class SpecialCreateWiki extends SpecialPage {
 
 		$out->addHTML(
 			'<div class="successbox">' . $this->msg( 'createwiki-success' )->escaped() . '</div>'
-		);
-
-		$out->addHTML(
-			'<div class="createwiki-dbline"><p>' . $dbline . '</p></div>'
 		);
 
 		return true;
