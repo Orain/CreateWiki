@@ -35,6 +35,7 @@ class SpecialCreateWiki extends SpecialPage {
 		$request = $this->getRequest();
 		$out = $this->getOutput();
 		$this->setHeaders();
+		$this->checkPermissions();
 
 		$this->showInputForm();
 
