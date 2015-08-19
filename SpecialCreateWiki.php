@@ -193,7 +193,7 @@ class SpecialCreateWiki extends SpecialPage {
 		global $wgCreateWikiUseCloudFlare;
 		if ( $wgCreateWikiUseCloudFlare ) {
 			$cloudFlareStatus = $this->addCloudFlareRecord( $DBname );
-			$postCreationStatus->merge( $cloudFlareStatus )
+			$postCreationStatus->merge( $cloudFlareStatus );
 		}
 
 		$shcreateaccount =
