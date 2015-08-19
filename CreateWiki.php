@@ -25,7 +25,7 @@ function efCreateWikiExceptionOnBadConfig() {
 }
 
 $wgExtensionCredits['specialpage'][] = array(
-	'author' => 'Southparkfan & Kudu',
+	'author' => 'Southparkfan, Kudu & Addshore',
 	'descriptionmsg' => 'createwiki-desc',
 	'name' => 'CreateWiki',
 	'path' => __FILE__,
