@@ -26,4 +26,3 @@ Based on the CheckUser extension by Tim Starling and Aaron Schulz.
 
  #### TODOS
   - Optionally update a local version / onwiki version of the dblist
-  - Re add cloudflare support
