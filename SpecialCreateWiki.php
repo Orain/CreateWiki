@@ -22,6 +22,7 @@
  * @author Kudu
  * @author Southparkfan
  * @author JohnFLewis
+ * @author Addshore
  */
 class SpecialCreateWiki extends SpecialPage {
 
@@ -249,6 +250,13 @@ class SpecialCreateWiki extends SpecialPage {
 			'<div class="successbox">' . $this->msg( 'createwiki-success' )->escaped() . '</div>'
 		);
 
+		//TODO i18n
+		$manualDbLine = "<p>If you need to add the dbline manually to a wikipage please use the following</p>";
+		$manualDbLine .= "<p>" . $this->getDbLine( $DBname, $sitename, $language, $private ) . "</p>";
+		$out->addHTML(
+			'<div class="successbox">' . $manualDbLine . '</div>'
+		);
+
 		return true;
 	}
 
@@ -330,7 +338,7 @@ class SpecialCreateWiki extends SpecialPage {
 
 		$status = new Status();
 
-		$dbline = "$DBname|$sitename|$language|\n";
+		$dbline = $this->getDbLine( $DBname, $sitename, $language, $private ) . "\n";
 		$writeSuccessPublic = file_put_contents(
 				$wgCreateWikiPublicDbListLocation,
 				$dbline,
@@ -354,6 +362,22 @@ class SpecialCreateWiki extends SpecialPage {
 		}
 
 		return $status;
+	}
+
+	/**
+	 * @param string $DBname
+	 * @param string $sitename
+	 * @param string $language
+	 * @param bool $private
+	 *
+	 * @return string
+	 */
+	private function getDbLine( $DBname, $sitename, $language, $private ) {
+		$dbline = "$DBname|$sitename|$language|";
+		if( $private ) {
+			$dbline .= 'private|';
+		}
+		return $dbline;
 	}
 
 	/**
