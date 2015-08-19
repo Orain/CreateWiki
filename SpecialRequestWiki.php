@@ -89,8 +89,6 @@ class SpecialRequestWiki extends SpecialPage {
 	}
 
 	function handleRequestWikiFormInput() {
-		global $wgRequest;
-
 		$request = $this->getRequest();
 		$out = $this->getOutput();
 		$vars = array( 'sitename', 'language', 'comments' );
@@ -136,10 +134,6 @@ class SpecialRequestWiki extends SpecialPage {
 			);
 
 			return false;
-		} elseif ( $subdomain && !$customdomain ) {
-			$domain = 'subdomain';
-		} else {
-			$domain = 'customdomain';
 		}
 
 		if ( !$this->getUser()->matchEditToken( $request->getVal( 'token' ) ) ) {

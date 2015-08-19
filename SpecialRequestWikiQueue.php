@@ -12,8 +12,6 @@ class SpecialRequestWikiQueue extends SpecialPage {
 	function execute( $par ) {
 		efCreateWikiExceptionOnBadConfig();
 
-		$request = $this->getRequest();
-		$out = $this->getOutput();
 		$this->setHeaders();
 
 		if ( is_null( $par ) || $par === '' ) {

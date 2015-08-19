@@ -33,7 +33,6 @@ class SpecialCreateWiki extends SpecialPage {
 		efCreateWikiExceptionOnBadConfig();
 
 		$request = $this->getRequest();
-		$out = $this->getOutput();
 		$this->setHeaders();
 		$this->checkPermissions();
 
@@ -219,8 +218,6 @@ class SpecialCreateWiki extends SpecialPage {
 	}
 
 	public function validateInput( $DBname, $founder ) {
-		$out = $this->getOutput();
-
 		$user = User::newFromName( $founder );
 		if ( !$user->getId() ) {
 			$this->addErrorBox( $this->msg( 'createwiki-error-foundernonexistent' )->escaped() );
@@ -288,7 +285,6 @@ class SpecialCreateWiki extends SpecialPage {
 	 * @return string the dbline that was added
 	 */
 	public function writeToDBlist( $DBname, $sitename, $language, $private ) {
-		global $IP;
 		global $wgCreateWikiPublicDbListLocation, $wgCreateWikiPrivateDbListLocation;
 
 		$dbline = "$DBname|$sitename|$language|\n";
