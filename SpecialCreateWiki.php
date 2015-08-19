@@ -151,25 +151,49 @@ class SpecialCreateWiki extends SpecialPage {
 		$farmerLogID = $farmerLogEntry->insert();
 		$farmerLogEntry->publish( $farmerLogID );
 
-		$dbw->query( 'SET storage_engine=InnoDB;' );
-		$dbw->query( 'CREATE DATABASE ' . $dbw->addIdentifierQuotes( $DBname ) . ';' );
+		try{
+			$dbw->query( 'SET storage_engine=InnoDB;' );
+			$dbw->query( 'CREATE DATABASE ' . $dbw->addIdentifierQuotes( $DBname ) . ';' );
+		} catch( MWException $ex ) {
+			//TODO i18n
+			$this->addErrorBox( "Failed to create database: " . $DBname );
+			return false;
+		}
+
+		$postCreationStatus = new Status();
+
 		$dbw->selectDB( $DBname );
 
-		foreach ( $wgCreateWikiSQLfiles as $sqlfile ) {
-			$dbw->sourceFile( $sqlfile );
+		foreach ( $wgCreateWikiSQLfiles as $key => $sqlfile ) {
+			try {
+				//TODO make sure the file exists first? Perhaps not be hard coded?
+				$dbw->sourceFile( $sqlfile );
+			} catch ( Exception $ex ) {
+				//TODO i18n
+				$postCreationStatus->merge(
+					Status::newFatal( 'Failed to run SQL files on new db: ' . $key )
+				);
+			}
 		}
 
 		// Update a local dblist if one is set
 		global $wgCreateWikiPublicDbListLocation;
 		global $wgCreateWikiPrivateDbListLocation;
-		if( is_string( $wgCreateWikiPublicDbListLocation ) ||
-			is_string( $wgCreateWikiPrivateDbListLocation ) ) {
-			$this->writeToDBlist( $DBname, $sitename, $language, $private );
+		if(
+			is_string( $wgCreateWikiPublicDbListLocation ) ||
+			is_string( $wgCreateWikiPrivateDbListLocation )
+		) {
+			$localDbListStatus = $this->writeToDBlist( $DBname, $sitename, $language, $private );
+			$postCreationStatus->merge( $localDbListStatus );
 		}
 
 		// TODO Update onwiki dblist if one is set
 
-		$this->addCloudFlareRecordIfEnabled( $DBname );
+		global $wgCreateWikiUseCloudFlare;
+		if ( $wgCreateWikiUseCloudFlare ) {
+			$cloudFlareStatus = $this->addCloudFlareRecord( $DBname );
+			$postCreationStatus->merge( $cloudFlareStatus )
+		}
 
 		$shcreateaccount =
 			exec(
@@ -179,14 +203,9 @@ class SpecialCreateWiki extends SpecialPage {
 				wfEscapeShellArg( $DBname )
 			);
 		if ( !strpos( $shcreateaccount, 'created' ) ) {
-			wfDebugLog(
-				'CreateWiki',
-				'Failed to create local account for founder. - error: ' . $shcreateaccount
+			$postCreationStatus->merge(
+				Status::newFatal( $this->msg( 'createwiki-error-usernotcreated' ) )
 			);
-
-			$this->addErrorBox( $this->msg( 'createwiki-error-usernotcreated' )->escaped() );
-
-			return false;
 		}
 
 		$shpromoteaccount =
@@ -197,23 +216,34 @@ class SpecialCreateWiki extends SpecialPage {
 				wfEscapeShellArg( $DBname )
 			);
 		if ( !strpos( $shpromoteaccount, 'done.' ) ) {
-			wfDebugLog(
-				'CreateWiki',
-				'Failed to promote local account for founder. - error: ' . $shpromoteaccount
+			$postCreationStatus->merge(
+				Status::newFatal( $this->msg( 'createwiki-error-usernotpromoted' ) )
 			);
-
-			$this->addErrorBox( $this->msg( 'createwiki-error-usernotpromoted' )->escaped() );
-
-			return false;
 		}
 
-		$this->createMainPage( $language );
+		$createMainPageStatus = $this->createMainPage( $language );
+		$postCreationStatus->merge( $createMainPageStatus );
 
 		// Grant founder sysop and bureaucrat rights
-		$founderUser =
-			UserRightsProxy::newFromName( $DBname, User::newFromName( $founder )->getName() );
-		$newGroups = array( 'sysop', 'bureaucrat' );
-		array_map( array( $founderUser, 'addGroup' ), $newGroups );
+		try{
+			$founderUser = UserRightsProxy::newFromName(
+				$DBname,
+				User::newFromName( $founder )->getName()
+			);
+			foreach( array( 'sysop', 'bureaucrat' ) as $group ) {
+				$founderUser->addGroup( $group );
+			}
+		} catch( Exception $ex ) {
+			$postCreationStatus->merge(
+				//TODO i18n
+				Status::newFatal( 'Failed to add groups to founding user' )
+			);
+		}
+
+		if ( !$validationStatus->isGood() ) {
+			$this->addErrorBox( $validationStatus->getHTML() );
+			return false;
+		}
 
 		$out->addHTML(
 			'<div class="successbox">' . $this->msg( 'createwiki-success' )->escaped() . '</div>'
@@ -293,67 +323,92 @@ class SpecialCreateWiki extends SpecialPage {
 	 * @param $language
 	 * @param $private
 	 *
-	 * @return string the dbline that was added
+	 * @return Status
 	 */
 	public function writeToDBlist( $DBname, $sitename, $language, $private ) {
 		global $wgCreateWikiPublicDbListLocation, $wgCreateWikiPrivateDbListLocation;
 
+		$status = new Status();
+
 		$dbline = "$DBname|$sitename|$language|\n";
-		file_put_contents( $wgCreateWikiPublicDbListLocation, $dbline, FILE_APPEND | LOCK_EX );
+		$writeSuccessPublic = file_put_contents(
+				$wgCreateWikiPublicDbListLocation,
+				$dbline,
+				FILE_APPEND | LOCK_EX
+			);
+
+		if( $writeSuccessPublic === false ) {
+			$status->merge( Status::newFatal( 'Failed to write to local public dblist' ) );
+		}
 
 		if ( $private !== 0 ) {
-			file_put_contents(
+			$writeSuccessPrivate = file_put_contents(
 				$wgCreateWikiPrivateDbListLocation,
 				"$DBname\n",
 				FILE_APPEND | LOCK_EX
 			);
+
+			if( $writeSuccessPrivate === false ) {
+				$status->merge( Status::newFatal( 'Failed to write to local private dblist' ) );
+			}
 		}
 
-		return $dbline;
+		return $status;
 	}
 
+	/**
+	 * @param string $lang
+	 *
+	 * @return Status
+	 */
 	public function createMainPage( $lang ) {
-		// Don't use Meta's mainpage message!
-		if ( $lang !== 'en' ) {
-			$page = wfMessage( 'mainpage' )->inLanguage( $lang )->plain();
-		} else {
-			$page = 'Main_Page';
+		try{
+			// Don't use Meta's mainpage message!
+			if ( $lang !== 'en' ) {
+				$page = wfMessage( 'mainpage' )->inLanguage( $lang )->plain();
+			} else {
+				$page = 'Main_Page';
+			}
+
+			$title = Title::newFromText( $page );
+			$article = WikiPage::factory( $title );
+
+			$article->doEditContent(
+				new WikitextContent(
+					wfMessage( 'createwiki-defaultmainpage' )->inLanguage( $lang )->plain()
+				),
+				'Create main page',
+				EDIT_NEW
+			);
+		} catch ( Exception $ex ) {
+			//TODO i18n
+			return Status::newFatal( 'Failed to create main page' );
 		}
+		return new Status();
 
-		$title = Title::newFromText( $page );
-		$article = WikiPage::factory( $title );
-
-		$article->doEditContent(
-			new WikitextContent(
-				wfMessage( 'createwiki-defaultmainpage' )->inLanguage( $lang )->plain()
-			),
-			'Create main page',
-			EDIT_NEW
-		);
 	}
 
 	/**
 	 * @param string $DBname
+	 *
+	 * @return Status
 	 */
-	public function addCloudFlareRecordIfEnabled( $DBname ) {
-		global $wgCreateWikiUseCloudFlare, $wgCloudFlareUser, $wgCloudFlareKey, $wgCreateWikiBaseDomain;
+	public function addCloudFlareRecord( $DBname ) {
+		global $wgCloudFlareUser, $wgCloudFlareKey, $wgCreateWikiBaseDomain;
 
-		if ( $wgCreateWikiUseCloudFlare ) {
-			$domainPrefix = substr( $DBname, 0, -4 );
-			$cloudFlare = new cloudflare_api( $wgCloudFlareUser, $wgCloudFlareKey );
-			$cloudFlareResult = $cloudFlare->rec_new(
-				$wgCreateWikiBaseDomain,
-				'CNAME',
-				$domainPrefix,
-				'lb.' . $wgCreateWikiBaseDomain
-			);
-			if( !is_object( $cloudFlareResult ) || $cloudFlareResult->result !== 'success' ) {
-				wfDebugLog( 'CreateWiki', 'CloudFlare FAILED to add CNAME for ' . $domainPrefix );
-			} else {
-				wfDebugLog( 'CreateWiki', 'CloudFlare CNAME added for ' . $domainPrefix );
-			}
+		$domainPrefix = substr( $DBname, 0, -4 );
+		$cloudFlare = new cloudflare_api( $wgCloudFlareUser, $wgCloudFlareKey );
+		$cloudFlareResult = $cloudFlare->rec_new(
+			$wgCreateWikiBaseDomain,
+			'CNAME',
+			$domainPrefix,
+			'lb.' . $wgCreateWikiBaseDomain
+		);
+		if( !is_object( $cloudFlareResult ) || $cloudFlareResult->result !== 'success' ) {
+			//TODO i18n
+			return Status::newFatal( 'CloudFlare FAILED to add CNAME for ' . $domainPrefix );
 		} else {
-			wfDebugLog( 'CreateWiki', 'CloudFlare is not enabled.' );
+			return new Status();
 		}
 	}
 }

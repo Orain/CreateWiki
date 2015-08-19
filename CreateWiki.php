@@ -58,9 +58,9 @@ $wgLogActionsHandlers['farmer/*'] = 'LogFormatter';
  * SQL files to be sourced into the created databases.
  */
 $wgCreateWikiSQLfiles = array(
-	"$IP/maintenance/tables.sql",
-	"$IP/extensions/AbuseFilter/abusefilter.tables.sql",
-	"$IP/extensions/AntiSpoof/sql/patch-antispoof.mysql.sql",
-	"$IP/extensions/CheckUser/cu_log.sql",
-	"$IP/extensions/CheckUser/cu_changes.sql",
+	'maintenance/tables.sql' => "$IP/maintenance/tables.sql",
+	'AbuseFilter/abusefilter.tables.sql' => "$IP/extensions/AbuseFilter/abusefilter.tables.sql",
+	'AntiSpoof/sql/patch-antispoof.mysql.sql' => "$IP/extensions/AntiSpoof/sql/patch-antispoof.mysql.sql",
+	'CheckUser/cu_log.sql' => "$IP/extensions/CheckUser/cu_log.sql",
+	'CheckUser/cu_changes.sql' => "$IP/extensions/CheckUser/cu_changes.sql",
 );
