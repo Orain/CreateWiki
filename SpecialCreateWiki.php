@@ -128,9 +128,10 @@ class SpecialCreateWiki extends SpecialPage {
 			return false;
 		}
 
-		$validation = $this->validateInput( $DBname, $founder );
+		$validationStatus = $this->validateInput( $DBname, $founder );
 
-		if ( !$validation ) {
+		if ( !$validationStatus->isGood() ) {
+			$this->getOutput()->addHTML( $validationStatus->getHTML() );
 			return false;
 		}
 
@@ -217,23 +218,33 @@ class SpecialCreateWiki extends SpecialPage {
 		return true;
 	}
 
+	/**
+	 * @param string $DBname
+	 * @param string $founder
+	 *
+	 * @return Status
+	 */
 	public function validateInput( $DBname, $founder ) {
-		$user = User::newFromName( $founder );
-		if ( !$user->getId() ) {
-			$this->addErrorBox( $this->msg( 'createwiki-error-foundernonexistent' )->escaped() );
+		$status = new Status();
 
-			return false;
+		if ( !User::newFromName( $founder )->getId() ) {
+			$status->merge( Status::newFatal( $this->msg( 'createwiki-error-foundernonexistent' ) ) );
 		}
 
-		if ( !$this->validateDBname( $DBname ) ) {
-			return false;
-		}
+		$status->merge( $this->validateDBname( $DBname ) );
 
-		return true;
+		return $status;
 	}
 
+	/**
+	 * @param string $DBname
+	 *
+	 * @return Status
+	 */
 	public function validateDBname( $DBname ) {
 		global $wgConf;
+
+		$status = new Status();
 
 		$suffixed = false;
 		foreach ( $wgConf->suffixes as $suffix ) {
@@ -247,26 +258,22 @@ class SpecialCreateWiki extends SpecialPage {
 		$res = $dbw->query( 'SHOW DATABASES LIKE ' . $dbw->addQuotes( $DBname ) . ';' );
 
 		if ( $res->numRows() !== 0 ) {
-			$this->addErrorBox( $this->msg( 'createwiki-error-dbexists' )->escaped() );
-			return false;
+			$status->merge( Status::newFatal( $this->msg( 'createwiki-error-dbexists' ) ) );
 		}
 
 		if ( !$suffixed ) {
-			$this->addErrorBox( $this->msg( 'createwiki-error-notsuffixed' )->escaped() );
-			return false;
+			$status->merge( Status::newFatal( $this->msg( 'createwiki-error-notsuffixed' ) ) );
 		}
 
 		if ( !ctype_alnum( $DBname ) ) {
-			$this->addErrorBox( $this->msg( 'createwiki-error-notalnum' )->escaped() );
-			return false;
+			$status->merge( Status::newFatal( $this->msg( 'createwiki-error-notalnum' ) ) );
 		}
 
 		if ( strtolower( $DBname ) !== $DBname ) {
-			$this->addErrorBox( $this->msg( 'createwiki-error-notlowercase' )->escaped() );
-			return false;
+			$status->merge( Status::newFatal( $this->msg( 'createwiki-error-notlowercase' ) ) );
 		}
 
-		return true;
+		return $status;
 	}
 
 	/**
