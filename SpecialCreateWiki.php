@@ -122,6 +122,10 @@ class SpecialCreateWiki extends SpecialPage {
 
 		$dbw = wfGetDB( DB_MASTER );
 
+		if ( $dbw->getType() === 'sqlite' ) {
+			throw new MWException( 'CreateWiki can not work with sqlite' );
+		}
+
 		if ( !$this->getUser()->matchEditToken( $request->getVal( 'cwToken' ) ) ) {
 			$out->addWikiMsg( 'createwiki-error-csrf' );
 

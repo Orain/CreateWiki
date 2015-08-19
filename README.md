@@ -15,6 +15,7 @@ Based on the CheckUser extension by Tim Starling and Aaron Schulz.
     $wgCloudFlareKey = 'bar';
 
 #### Notes
+ - This extension WILL NOT work with SQLITE
  - This extension requires php to be loacted at */usr/bin/php*.
  - This extension requires the mediawiki DB user to have *CREATE DATABASE* permissions.
 
