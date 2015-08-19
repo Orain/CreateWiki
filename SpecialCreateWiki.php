@@ -180,11 +180,7 @@ class SpecialCreateWiki extends SpecialPage {
 				'Failed to create local account for founder. - error: ' . $shcreateaccount
 			);
 
-			$out->addHTML(
-				'<div class="errorbox">' .
-				$this->msg( 'createwiki-error-usernotcreated' )->escaped() .
-				'</div>'
-			);
+			$this->addErrorBox( $this->msg( 'createwiki-error-usernotcreated' )->escaped() );
 
 			return false;
 		}
@@ -202,11 +198,7 @@ class SpecialCreateWiki extends SpecialPage {
 				'Failed to promote local account for founder. - error: ' . $shpromoteaccount
 			);
 
-			$out->addHTML(
-				'<div class="errorbox">' .
-				$this->msg( 'createwiki-error-usernotpromoted' )->escaped() .
-				'</div>'
-			);
+			$this->addErrorBox( $this->msg( 'createwiki-error-usernotpromoted' )->escaped() );
 
 			return false;
 		}
@@ -231,11 +223,7 @@ class SpecialCreateWiki extends SpecialPage {
 
 		$user = User::newFromName( $founder );
 		if ( !$user->getId() ) {
-			$out->addHTML(
-				'<div class="errorbox">' .
-				$this->msg( 'createwiki-error-foundernonexistent' )->escaped() .
-				'</div>'
-			);
+			$this->addErrorBox( $this->msg( 'createwiki-error-foundernonexistent' )->escaped() );
 
 			return false;
 		}
@@ -249,7 +237,6 @@ class SpecialCreateWiki extends SpecialPage {
 
 	public function validateDBname( $DBname ) {
 		global $wgConf;
-		$out = $this->getOutput();
 
 		$suffixed = false;
 		foreach ( $wgConf->suffixes as $suffix ) {
@@ -263,46 +250,33 @@ class SpecialCreateWiki extends SpecialPage {
 		$res = $dbw->query( 'SHOW DATABASES LIKE ' . $dbw->addQuotes( $DBname ) . ';' );
 
 		if ( $res->numRows() !== 0 ) {
-			$out->addHTML(
-				'<div class="errorbox">' .
-				$this->msg( 'createwiki-error-dbexists' )->escaped() .
-				'</div>'
-			);
-
+			$this->addErrorBox( $this->msg( 'createwiki-error-dbexists' )->escaped() );
 			return false;
 		}
 
 		if ( !$suffixed ) {
-			$out->addHTML(
-				'<div class="errorbox">' .
-				$this->msg( 'createwiki-error-notsuffixed' )->escaped() .
-				'</div>'
-			);
-
+			$this->addErrorBox( $this->msg( 'createwiki-error-notsuffixed' )->escaped() );
 			return false;
 		}
 
 		if ( !ctype_alnum( $DBname ) ) {
-			$out->addHTML(
-				'<div class="errorbox">' .
-				$this->msg( 'createwiki-error-notalnum' )->escaped() .
-				'</div>'
-			);
-
+			$this->addErrorBox( $this->msg( 'createwiki-error-notalnum' )->escaped() );
 			return false;
 		}
 
 		if ( strtolower( $DBname ) !== $DBname ) {
-			$out->addHTML(
-				'<div class="errorbox">' .
-				$this->msg( 'createwiki-error-notlowercase' )->escaped() .
-				'</div>'
-			);
-
+			$this->addErrorBox( $this->msg( 'createwiki-error-notlowercase' )->escaped() );
 			return false;
 		}
 
 		return true;
+	}
+
+	/**
+	 * @param string $content
+	 */
+	private function addErrorBox( $content ) {
+		$this->getOutput()->addHTML( '<div class="errorbox">' . $content . '</div>');
 	}
 
 	/**
