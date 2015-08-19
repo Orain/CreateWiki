@@ -246,15 +246,12 @@ class SpecialCreateWiki extends SpecialPage {
 			return false;
 		}
 
-		$out->addHTML(
-			'<div class="successbox">' . $this->msg( 'createwiki-success' )->escaped() . '</div>'
-		);
-
+		$successText = $this->msg( 'createwiki-success' )->escaped();
 		//TODO i18n
-		$manualDbLine = "<p>If you need to add the dbline manually to a wikipage please use the following</p>";
-		$manualDbLine .= "<p>" . $this->getDbLine( $DBname, $sitename, $language, $private ) . "</p>";
+		$successText .= "<p>If you need to add the dbline manually to a wikipage please use the following</p>";
+		$successText .= "<p>" . $this->getDbLine( $DBname, $sitename, $language, $private ) . "</p>";
 		$out->addHTML(
-			'<div class="successbox">' . $manualDbLine . '</div>'
+			'<div class="successbox">' . $successText . '</div>'
 		);
 
 		return true;
