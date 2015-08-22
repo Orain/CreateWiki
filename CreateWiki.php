@@ -35,6 +35,7 @@ $wgExtensionCredits['specialpage'][] = array(
 $wgAutoloadClasses['cloudflare_api'] = __DIR__ . '/lib/class_cloudflare.php';
 $wgAutoloadClasses['SpecialCreateWiki'] = __DIR__ . '/SpecialCreateWiki.php';
 $wgAutoloadClasses['CreateWikiHooks'] = __DIR__ . '/CreateWiki.hooks.php';
+$wgAutoloadClasses['CreateWikiLogFormatter'] = __DIR__ . '/CreateWikiLogFormatter.php';
 $wgAutoloadClasses['RequestWikiQueuePager'] = __DIR__ . '/RequestWikiQueuePager.php';
 $wgAutoloadClasses['SpecialRequestWiki'] = __DIR__ . '/SpecialRequestWiki.php';
 $wgAutoloadClasses['SpecialRequestWikiQueue'] = __DIR__ . '/SpecialRequestWikiQueue.php';
@@ -52,7 +53,8 @@ $wgHooks['LoadExtensionSchemaUpdates'][] = 'CreateWikiHooks::fnCreateWikiSchemaU
 
 $wgAvailableRights[] = 'createwiki';
 $wgLogTypes[] = 'farmer';
-$wgLogActionsHandlers['farmer/*'] = 'LogFormatter';
+$wgLogActionsHandlers['farmer/createwiki'] = 'LogFormatter';
+$wgLogActionsHandlers['farmer/requestwiki'] = 'CreateWikiLogFormatter';
 
 /**
  * SQL files to be sourced into the created databases.
