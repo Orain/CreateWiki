@@ -225,22 +225,6 @@ class SpecialCreateWiki extends SpecialPage {
 		$createMainPageStatus = $this->createMainPage( $language );
 		$postCreationStatus->merge( $createMainPageStatus );
 
-		// Grant founder sysop and bureaucrat rights
-		try{
-			$founderUser = UserRightsProxy::newFromName(
-				$DBname,
-				User::newFromName( $founder )->getName()
-			);
-			foreach( array( 'sysop', 'bureaucrat' ) as $group ) {
-				$founderUser->addGroup( $group );
-			}
-		} catch( Exception $ex ) {
-			$postCreationStatus->merge(
-				//TODO i18n
-				Status::newFatal( 'Failed to add groups to founding user' )
-			);
-		}
-
 		if ( !$validationStatus->isGood() ) {
 			$this->addErrorBox( $validationStatus->getHTML() );
 			return false;
